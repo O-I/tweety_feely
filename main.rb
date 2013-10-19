@@ -9,19 +9,24 @@ puts Time.now
 @streaming_client.filter(track: topics.join(",")) do |tweet|
   if tweet.lang == 'en'
     i += 1
-    feely_tweets << {user: tweet.attrs[:user][:screen_name], tweet: tweet.text}
+    print i
+    begin
+      feely_tweets << {user: tweet.attrs[:user][:screen_name], tweet: tweet.text}
     # puts "#{i} tweets gathered"
     # puts "#{tweet.attrs[:user][:screen_name]} tweeted about feelings: #{tweet.text}"
+    rescue JSON::ParserError
+      next
+    end
   end
   break if i > 10_000
 end
 
+Time.now
+
 words = feely_tweets.map { |tweet_datum| tweet_datum[:tweet].split(' ') }.flatten!
 
 sentiment = Hash.new(0)
-words.each do |word|
-  sentiment[word.to_sym] += 1 if topics.include? word
-end
+words.each { |word| sentiment[word.to_sym] += 1 if topics.include? word }
 
 sentiment.each { |word, frequency| print "#{word}: #{frequency}\n" }
 
