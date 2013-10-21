@@ -7,16 +7,16 @@ i = 0
 puts Time.now
 
 @streaming_client.filter(track: topics.join(",")) do |tweet|
-  if tweet.lang == 'en'
-    i += 1
-    print i
-    begin
-      feely_tweets << {user: tweet.attrs[:user][:screen_name], tweet: tweet.text}
-    # puts "#{i} tweets gathered"
-    # puts "#{tweet.attrs[:user][:screen_name]} tweeted about feelings: #{tweet.text}"
-    rescue JSON::ParserError
-      next
+  begin
+    if tweet.lang == 'en'
+      i += 1
+      print i
+        feely_tweets << {user: tweet.attrs[:user][:screen_name], tweet: tweet.text}
+      # puts "#{i} tweets gathered"
+      # puts "#{tweet.attrs[:user][:screen_name]} tweeted about feelings: #{tweet.text}"
     end
+  rescue JSON::ParserError
+    next
   end
   break if i > 10_000
 end
