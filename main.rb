@@ -11,23 +11,24 @@ puts Time.now
     if tweet.lang == 'en'
       i += 1
       print i
-        feely_tweets << {user: tweet.attrs[:user][:screen_name], tweet: tweet.text}
+      feely_tweets << {user: tweet.attrs[:user][:screen_name], tweet: tweet.text}
       # puts "#{i} tweets gathered"
       # puts "#{tweet.attrs[:user][:screen_name]} tweeted about feelings: #{tweet.text}"
     end
   rescue JSON::ParserError
     next
   end
-  break if i > 10_000
+  break if i > 1000
 end
 
-Time.now
+puts Time.now
 
 words = feely_tweets.map { |tweet_datum| tweet_datum[:tweet].split(' ') }.flatten!
 
 sentiment = Hash.new(0)
 words.each { |word| sentiment[word.to_sym] += 1 if topics.include? word }
-
+sentiment = sentiment.sort_by { |word, frequency| frequency }.reverse
 sentiment.each { |word, frequency| print "#{word}: #{frequency}\n" }
+puts Hash[sentiment].values.reduce(:+)
 
 puts Time.now
